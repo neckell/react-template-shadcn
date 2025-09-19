@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import { devtools } from 'zustand/middleware'
+import { devtools, persist } from 'zustand/middleware'
 
 interface User {
   id: string
@@ -12,6 +12,7 @@ interface AppState {
   // Theme state
   theme: 'light' | 'dark'
   setTheme: (theme: 'light' | 'dark') => void
+  initializeTheme: () => void
   
   // User state
   user: User | null
@@ -29,24 +30,45 @@ interface AppState {
 
 export const useAppStore = create<AppState>()(
   devtools(
-    (set) => ({
-      // Theme
-      theme: 'light',
-      setTheme: (theme) => set({ theme }),
-      
-      // User
-      user: null,
-      setUser: (user) => set({ user }),
-      
-      // Loading
-      isLoading: false,
-      setIsLoading: (isLoading) => set({ isLoading }),
-      
-      // Sidebar
-      sidebarOpen: true,
-      setSidebarOpen: (sidebarOpen) => set({ sidebarOpen }),
-      toggleSidebar: () => set((state) => ({ sidebarOpen: !state.sidebarOpen })),
-    }),
+    persist(
+      (set, get) => ({
+        // Theme
+        theme: 'light',
+        setTheme: (theme) => {
+          console.log('Store: Setting theme to', theme)
+          set({ theme })
+          // Apply theme to HTML element
+          document.documentElement.classList.toggle('dark', theme === 'dark')
+          console.log('Store: HTML classes after setTheme:', document.documentElement.className)
+        },
+        initializeTheme: () => {
+          const { theme } = get()
+          // Apply theme to HTML element on initialization
+          document.documentElement.classList.toggle('dark', theme === 'dark')
+        },
+        
+        // User
+        user: null,
+        setUser: (user) => set({ user }),
+        
+        // Loading
+        isLoading: false,
+        setIsLoading: (isLoading) => set({ isLoading }),
+        
+        // Sidebar
+        sidebarOpen: true,
+        setSidebarOpen: (sidebarOpen) => set({ sidebarOpen }),
+        toggleSidebar: () => set((state) => ({ sidebarOpen: !state.sidebarOpen })),
+      }),
+      {
+        name: 'app-store',
+        // Only persist theme and sidebar state
+        partialize: (state) => ({ 
+          theme: state.theme,
+          sidebarOpen: state.sidebarOpen 
+        }),
+      }
+    ),
     {
       name: 'app-store',
     }
