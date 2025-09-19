@@ -1,37 +1,62 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card'
 import { Button } from '../components/ui/button'
-import { Users, FileText, TrendingUp, Activity, Bell, CheckCircle, AlertTriangle, XCircle } from 'lucide-react'
+import { Users, FileText, TrendingUp, Activity, Bell, CheckCircle, AlertTriangle, XCircle, RefreshCw, Loader2 } from 'lucide-react'
 import { useToast } from '../hooks/use-toast'
-
-const stats = [
-  {
-    title: 'Total Users',
-    value: '2,345',
-    description: '+20.1% from last month',
-    icon: Users,
-  },
-  {
-    title: 'Active Projects',
-    value: '145',
-    description: '+15% from last month',
-    icon: FileText,
-  },
-  {
-    title: 'Revenue',
-    value: '$45,231',
-    description: '+25% from last month',
-    icon: TrendingUp,
-  },
-  {
-    title: 'Activity',
-    value: '573',
-    description: '+12% from last month',
-    icon: Activity,
-  },
-]
+import { useDashboardStats, useRecentActivity } from '../hooks/api/useDashboard'
+import { useCreateUser, useUsers } from '../hooks/api/useUsers'
+import { formatDistanceToNow } from 'date-fns'
 
 export function Dashboard() {
   const { toast } = useToast()
+
+  const {
+    data: dashboardStats,
+    isLoading: statsLoading,
+    error: statsError,
+    refetch: refetchStats
+  } = useDashboardStats()
+
+  const {
+    data: recentActivity,
+    isLoading: activityLoading,
+    error: activityError,
+    refetch: refetchActivity
+  } = useRecentActivity()
+
+  const {
+    data: users,
+    isLoading: usersLoading,
+    refetch: refetchUsers
+  } = useUsers()
+
+  const createUserMutation = useCreateUser()
+
+  const stats = dashboardStats ? [
+    {
+      title: 'Total Users',
+      value: dashboardStats.totalUsers.toLocaleString(),
+      description: `+${dashboardStats.userGrowth}% from last month`,
+      icon: Users,
+    },
+    {
+      title: 'Active Projects',
+      value: dashboardStats.activeProjects.toString(),
+      description: `+${dashboardStats.projectGrowth}% from last month`,
+      icon: FileText,
+    },
+    {
+      title: 'Revenue',
+      value: `$${dashboardStats.revenue.toLocaleString()}`,
+      description: `+${dashboardStats.revenueGrowth}% from last month`,
+      icon: TrendingUp,
+    },
+    {
+      title: 'Activity',
+      value: dashboardStats.activity.toString(),
+      description: `+${dashboardStats.activityGrowth}% from last month`,
+      icon: Activity,
+    },
+  ] : []
 
   const showSuccessToast = () => {
     toast({
@@ -64,6 +89,25 @@ export function Dashboard() {
     })
   }
 
+  const handleCreateUser = () => {
+    createUserMutation.mutate({
+      name: "John Doe",
+      email: "john.doe@example.com",
+      role: "user",
+    })
+  }
+
+  const handleRefreshData = () => {
+    refetchStats()
+    refetchActivity()
+    refetchUsers()
+    toast({
+      title: "Data Refreshed",
+      description: "All dashboard data has been refreshed.",
+      variant: "success",
+    })
+  }
+
   return (
     <div className="space-y-6">
       <div>
@@ -73,19 +117,43 @@ export function Dashboard() {
         </p>
       </div>
 
-      {/* Toast Demo Section */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Bell className="h-5 w-5" />
-            Toast Notifications Demo
+            <Activity className="h-5 w-5" />
+            TanStack Query API Demo
           </CardTitle>
           <CardDescription>
-            Click the buttons below to see different types of toast notifications in action.
+            Interact with API endpoints using TanStack Query. See loading states, error handling, and optimistic updates.
           </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="flex flex-wrap gap-4">
+            <Button
+              onClick={handleRefreshData}
+              variant="outline"
+              className="flex items-center gap-2"
+              disabled={statsLoading || activityLoading}
+            >
+              {statsLoading || activityLoading ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <RefreshCw className="h-4 w-4" />
+              )}
+              Refresh Data
+            </Button>
+            <Button
+              onClick={handleCreateUser}
+              className="flex items-center gap-2"
+              disabled={createUserMutation.isPending}
+            >
+              {createUserMutation.isPending ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Users className="h-4 w-4" />
+              )}
+              Create User
+            </Button>
             <Button onClick={showSuccessToast} className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white">
               <CheckCircle className="h-4 w-4" />
               Success Toast
@@ -94,54 +162,94 @@ export function Dashboard() {
               <XCircle className="h-4 w-4" />
               Error Toast
             </Button>
-            <Button onClick={showInfoToast} variant="outline" className="flex items-center gap-2">
-              <Bell className="h-4 w-4" />
-              Info Toast
-            </Button>
             <Button onClick={showWarningToast} className="flex items-center gap-2 bg-yellow-600 hover:bg-yellow-700 text-white">
               <AlertTriangle className="h-4 w-4" />
               Warning Toast
             </Button>
           </div>
+
+          <div className="mt-4 p-4 bg-muted/50 rounded-lg">
+            <h4 className="font-medium mb-2">API Status:</h4>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+              <div className="flex items-center gap-2">
+                <div className={`w-2 h-2 rounded-full ${statsLoading ? 'bg-yellow-500' : statsError ? 'bg-red-500' : 'bg-green-500'}`} />
+                Dashboard Stats: {statsLoading ? 'Loading...' : statsError ? 'Error' : 'Ready'}
+              </div>
+              <div className="flex items-center gap-2">
+                <div className={`w-2 h-2 rounded-full ${activityLoading ? 'bg-yellow-500' : activityError ? 'bg-red-500' : 'bg-green-500'}`} />
+                Recent Activity: {activityLoading ? 'Loading...' : activityError ? 'Error' : 'Ready'}
+              </div>
+              <div className="flex items-center gap-2">
+                <div className={`w-2 h-2 rounded-full ${usersLoading ? 'bg-yellow-500' : 'bg-green-500'}`} />
+                Users: {usersLoading ? 'Loading...' : `${users?.length || 0} loaded`}
+              </div>
+            </div>
+          </div>
         </CardContent>
       </Card>
 
-      {/* Stats Grid */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        {stats.map((stat) => {
-          const Icon = stat.icon
-          return (
-            <Card 
-              key={stat.title} 
-              className="cursor-pointer hover:shadow-md transition-shadow"
-              onClick={() => {
-                toast({
-                  title: `${stat.title} Updated`,
-                  description: `Current value: ${stat.value}. ${stat.description}`,
-                })
-              }}
-            >
+        {statsLoading ? (
+          Array.from({ length: 4 }).map((_, index) => (
+            <Card key={index}>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">
-                  {stat.title}
-                </CardTitle>
-                <Icon className="h-4 w-4 text-muted-foreground" />
+                <div className="h-4 w-24 bg-muted animate-pulse rounded" />
+                <div className="h-4 w-4 bg-muted animate-pulse rounded" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">{stat.value}</div>
-                <p className="text-xs text-muted-foreground">
-                  {stat.description}
-                </p>
-                <p className="text-xs text-blue-600 mt-1">
-                  Click for details
-                </p>
+                <div className="h-8 w-16 bg-muted animate-pulse rounded mb-2" />
+                <div className="h-3 w-32 bg-muted animate-pulse rounded" />
               </CardContent>
             </Card>
-          )
-        })}
+          ))
+        ) : statsError ? (
+          <Card className="col-span-full">
+            <CardContent className="flex items-center justify-center py-8">
+              <div className="text-center">
+                <XCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
+                <p className="text-muted-foreground">Failed to load dashboard stats</p>
+                <Button onClick={() => refetchStats()} variant="outline" className="mt-2">
+                  <RefreshCw className="h-4 w-4 mr-2" />
+                  Retry
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        ) : (
+          stats.map((stat) => {
+            const Icon = stat.icon
+            return (
+              <Card
+                key={stat.title}
+                className="cursor-pointer hover:shadow-md transition-shadow"
+                onClick={() => {
+                  toast({
+                    title: `${stat.title} Updated`,
+                    description: `Current value: ${stat.value}. ${stat.description}`,
+                  })
+                }}
+              >
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">
+                    {stat.title}
+                  </CardTitle>
+                  <Icon className="h-4 w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">{stat.value}</div>
+                  <p className="text-xs text-muted-foreground">
+                    {stat.description}
+                  </p>
+                  <p className="text-xs text-blue-600 mt-1">
+                    Click for details
+                  </p>
+                </CardContent>
+              </Card>
+            )
+          })
+        )}
       </div>
 
-      {/* Charts Section */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
         <Card className="col-span-4">
           <CardHeader>
@@ -155,68 +263,70 @@ export function Dashboard() {
         </Card>
         <Card className="col-span-3">
           <CardHeader>
-            <CardTitle>Recent Activity</CardTitle>
+            <CardTitle className="flex items-center justify-between">
+              Recent Activity
+              {activityLoading && <Loader2 className="h-4 w-4 animate-spin" />}
+            </CardTitle>
             <CardDescription>
-              You have 3 new notifications this week.
+              {recentActivity ? `You have ${recentActivity.length} recent activities.` : 'Loading recent activities...'}
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="space-y-4">
-              <div 
-                className="flex items-center cursor-pointer hover:bg-muted/50 p-2 rounded-md transition-colors"
-                onClick={() => {
-                  toast({
-                    title: "New User Registration",
-                    description: "John Doe has successfully registered to the platform.",
-                  })
-                }}
-              >
-                <div className="ml-4 space-y-1">
-                  <p className="text-sm font-medium leading-none">
-                    New user registered
-                  </p>
-                  <p className="text-sm text-muted-foreground">
-                    2 minutes ago
-                  </p>
-                </div>
+            {activityLoading ? (
+              <div className="space-y-4">
+                {Array.from({ length: 3 }).map((_, index) => (
+                  <div key={index} className="flex items-center p-2">
+                    <div className="ml-4 space-y-2 flex-1">
+                      <div className="h-4 w-32 bg-muted animate-pulse rounded" />
+                      <div className="h-3 w-20 bg-muted animate-pulse rounded" />
+                    </div>
+                  </div>
+                ))}
               </div>
-              <div 
-                className="flex items-center cursor-pointer hover:bg-muted/50 p-2 rounded-md transition-colors"
-                onClick={() => {
-                  toast({
-                    title: "Project Update",
-                    description: "React Dashboard project has been successfully updated with new features.",
-                  })
-                }}
-              >
-                <div className="ml-4 space-y-1">
-                  <p className="text-sm font-medium leading-none">
-                    Project updated
-                  </p>
-                  <p className="text-sm text-muted-foreground">
-                    1 hour ago
-                  </p>
-                </div>
+            ) : activityError ? (
+              <div className="text-center py-8">
+                <XCircle className="h-8 w-8 text-red-500 mx-auto mb-2" />
+                <p className="text-muted-foreground text-sm">Failed to load recent activity</p>
+                <Button onClick={() => refetchActivity()} variant="outline" size="sm" className="mt-2">
+                  <RefreshCw className="h-3 w-3 mr-1" />
+                  Retry
+                </Button>
               </div>
-              <div 
-                className="flex items-center cursor-pointer hover:bg-muted/50 p-2 rounded-md transition-colors"
-                onClick={() => {
-                  toast({
-                    title: "System Maintenance",
-                    description: "Scheduled maintenance completed successfully. All systems are operational.",
-                  })
-                }}
-              >
-                <div className="ml-4 space-y-1">
-                  <p className="text-sm font-medium leading-none">
-                    System maintenance
-                  </p>
-                  <p className="text-sm text-muted-foreground">
-                    3 hours ago
-                  </p>
-                </div>
+            ) : recentActivity && recentActivity.length > 0 ? (
+              <div className="space-y-4">
+                {recentActivity.map((activity) => (
+                  <div
+                    key={activity.id}
+                    className="flex items-center cursor-pointer hover:bg-muted/50 p-2 rounded-md transition-colors"
+                    onClick={() => {
+                      toast({
+                        title: activity.title,
+                        description: activity.description,
+                      })
+                    }}
+                  >
+                    <div className="ml-4 space-y-1 flex-1">
+                      <p className="text-sm font-medium leading-none">
+                        {activity.title}
+                      </p>
+                      <p className="text-sm text-muted-foreground">
+                        {formatDistanceToNow(new Date(activity.timestamp), { addSuffix: true })}
+                      </p>
+                      {activity.user && (
+                        <p className="text-xs text-blue-600">
+                          by {activity.user.name}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                ))}
               </div>
-            </div>
+            ) : (
+              <div className="text-center py-8">
+                <Activity className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
+                <p className="text-muted-foreground text-sm">No recent activity</p>
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>

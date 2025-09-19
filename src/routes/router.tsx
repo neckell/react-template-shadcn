@@ -4,52 +4,31 @@ import { Dashboard } from '../pages/Dashboard'
 import { Users } from '../pages/Users'
 import { Settings } from '../pages/Settings'
 import { Forms } from '../pages/Forms'
+import { Paths } from './Paths'
 
-// Root route
 const rootRoute = createRootRoute({
   component: Layout,
 })
 
-// Dashboard route
-const dashboardRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  path: '/',
-  component: Dashboard,
-})
+const routes = [
+  { path: Paths.Dashboard, component: Dashboard },
+  { path: Paths.Users, component: Users },
+  { path: Paths.Forms, component: Forms },
+  { path: Paths.Settings, component: Settings },
+]
 
-// Users route
-const usersRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  path: '/users',
-  component: Users,
-})
+const routeTree = rootRoute.addChildren(
+  routes.map(({ path, component }) =>
+    createRoute({
+      getParentRoute: () => rootRoute,
+      path,
+      component,
+    })
+  )
+)
 
-// Forms route
-const formsRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  path: '/forms',
-  component: Forms,
-})
-
-// Settings route
-const settingsRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  path: '/settings',
-  component: Settings,
-})
-
-// Create the route tree
-const routeTree = rootRoute.addChildren([
-  dashboardRoute,
-  usersRoute,
-  formsRoute,
-  settingsRoute,
-])
-
-// Create the router
 export const router = createRouter({ routeTree })
 
-// Register the router instance for type safety
 declare module '@tanstack/react-router' {
   interface Register {
     router: typeof router

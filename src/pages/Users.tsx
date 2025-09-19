@@ -2,7 +2,7 @@ import { ColumnDef } from '@tanstack/react-table'
 import { MoreHorizontal, ArrowUpDown } from 'lucide-react'
 import { Button } from '../components/ui/button'
 import { DataTable } from '../components/features/DataTable'
-import { User } from '../types'
+import { User } from '../domain'
 
 // Mock data
 const mockUsers: User[] = [
@@ -86,13 +86,12 @@ const columns: ColumnDef<User>[] = [
       const role = row.getValue('role') as string
       return (
         <div className="capitalize">
-          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-            role === 'admin' 
-              ? 'bg-red-100 text-red-800' 
+          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${role === 'admin'
+              ? 'bg-red-100 text-red-800'
               : role === 'manager'
-              ? 'bg-blue-100 text-blue-800'
-              : 'bg-green-100 text-green-800'
-          }`}>
+                ? 'bg-blue-100 text-blue-800'
+                : 'bg-green-100 text-green-800'
+            }`}>
             {role}
           </span>
         </div>
@@ -146,9 +145,9 @@ export function Users() {
         <Button>Add User</Button>
       </div>
 
-      <DataTable 
-        columns={columns} 
-        data={mockUsers} 
+      <DataTable
+        columns={columns}
+        data={mockUsers}
         searchKey="name"
         searchPlaceholder="Search users..."
       />
