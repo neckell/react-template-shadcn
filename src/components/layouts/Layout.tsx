@@ -4,6 +4,7 @@ import { cn } from '../../lib/utils'
 import { useAppStore } from '../../store/useAppStore'
 import { Header } from './Header'
 import { Sidebar } from './Sidebar'
+import { Toaster } from '../ui/toaster'
 
 export function Layout() {
   const sidebarOpen = useAppStore((state) => state.sidebarOpen)
@@ -33,6 +34,7 @@ export function Layout() {
           </main>
         </div>
       </div>
+      <Toaster />
     </>
   )
 }

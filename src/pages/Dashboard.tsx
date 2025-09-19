@@ -1,5 +1,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card'
-import { Users, FileText, TrendingUp, Activity } from 'lucide-react'
+import { Button } from '../components/ui/button'
+import { Users, FileText, TrendingUp, Activity, Bell, CheckCircle, AlertTriangle, XCircle } from 'lucide-react'
+import { useToast } from '../hooks/use-toast'
 
 const stats = [
   {
@@ -29,6 +31,39 @@ const stats = [
 ]
 
 export function Dashboard() {
+  const { toast } = useToast()
+
+  const showSuccessToast = () => {
+    toast({
+      title: "Success!",
+      description: "Your action was completed successfully.",
+      variant: "success",
+    })
+  }
+
+  const showErrorToast = () => {
+    toast({
+      title: "Error",
+      description: "Something went wrong. Please try again.",
+      variant: "destructive",
+    })
+  }
+
+  const showInfoToast = () => {
+    toast({
+      title: "Information",
+      description: "Here's some important information for you.",
+    })
+  }
+
+  const showWarningToast = () => {
+    toast({
+      title: "Warning",
+      description: "Please review this action before proceeding.",
+      variant: "warning",
+    })
+  }
+
   return (
     <div className="space-y-6">
       <div>
@@ -38,12 +73,54 @@ export function Dashboard() {
         </p>
       </div>
 
+      {/* Toast Demo Section */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Bell className="h-5 w-5" />
+            Toast Notifications Demo
+          </CardTitle>
+          <CardDescription>
+            Click the buttons below to see different types of toast notifications in action.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="flex flex-wrap gap-4">
+            <Button onClick={showSuccessToast} className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white">
+              <CheckCircle className="h-4 w-4" />
+              Success Toast
+            </Button>
+            <Button onClick={showErrorToast} variant="destructive" className="flex items-center gap-2">
+              <XCircle className="h-4 w-4" />
+              Error Toast
+            </Button>
+            <Button onClick={showInfoToast} variant="outline" className="flex items-center gap-2">
+              <Bell className="h-4 w-4" />
+              Info Toast
+            </Button>
+            <Button onClick={showWarningToast} className="flex items-center gap-2 bg-yellow-600 hover:bg-yellow-700 text-white">
+              <AlertTriangle className="h-4 w-4" />
+              Warning Toast
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+
       {/* Stats Grid */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         {stats.map((stat) => {
           const Icon = stat.icon
           return (
-            <Card key={stat.title}>
+            <Card 
+              key={stat.title} 
+              className="cursor-pointer hover:shadow-md transition-shadow"
+              onClick={() => {
+                toast({
+                  title: `${stat.title} Updated`,
+                  description: `Current value: ${stat.value}. ${stat.description}`,
+                })
+              }}
+            >
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">
                   {stat.title}
@@ -54,6 +131,9 @@ export function Dashboard() {
                 <div className="text-2xl font-bold">{stat.value}</div>
                 <p className="text-xs text-muted-foreground">
                   {stat.description}
+                </p>
+                <p className="text-xs text-blue-600 mt-1">
+                  Click for details
                 </p>
               </CardContent>
             </Card>
@@ -82,7 +162,15 @@ export function Dashboard() {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              <div className="flex items-center">
+              <div 
+                className="flex items-center cursor-pointer hover:bg-muted/50 p-2 rounded-md transition-colors"
+                onClick={() => {
+                  toast({
+                    title: "New User Registration",
+                    description: "John Doe has successfully registered to the platform.",
+                  })
+                }}
+              >
                 <div className="ml-4 space-y-1">
                   <p className="text-sm font-medium leading-none">
                     New user registered
@@ -92,7 +180,15 @@ export function Dashboard() {
                   </p>
                 </div>
               </div>
-              <div className="flex items-center">
+              <div 
+                className="flex items-center cursor-pointer hover:bg-muted/50 p-2 rounded-md transition-colors"
+                onClick={() => {
+                  toast({
+                    title: "Project Update",
+                    description: "React Dashboard project has been successfully updated with new features.",
+                  })
+                }}
+              >
                 <div className="ml-4 space-y-1">
                   <p className="text-sm font-medium leading-none">
                     Project updated
@@ -102,7 +198,15 @@ export function Dashboard() {
                   </p>
                 </div>
               </div>
-              <div className="flex items-center">
+              <div 
+                className="flex items-center cursor-pointer hover:bg-muted/50 p-2 rounded-md transition-colors"
+                onClick={() => {
+                  toast({
+                    title: "System Maintenance",
+                    description: "Scheduled maintenance completed successfully. All systems are operational.",
+                  })
+                }}
+              >
                 <div className="ml-4 space-y-1">
                   <p className="text-sm font-medium leading-none">
                     System maintenance
