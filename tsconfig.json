@@ -2,7 +2,11 @@
   "compilerOptions": {
     "target": "ESNext",
     "useDefineForClassFields": true,
-    "lib": ["DOM", "DOM.Iterable", "ESNext"],
+    "lib": [
+      "DOM",
+      "DOM.Iterable",
+      "ESNext"
+    ],
     "allowJs": false,
     "skipLibCheck": true,
     "esModuleInterop": false,
@@ -10,14 +14,30 @@
     "strict": true,
     "forceConsistentCasingInFileNames": true,
     "module": "ESNext",
-    "moduleResolution": "Node",
+    "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
     "jsx": "react-jsx",
-    "types": ["node", "jest", "@testing-library/jest-dom"]
+    "types": [
+      "node",
+    ],
+    "baseUrl": ".",
+    "paths": {
+      "@/*": [
+        "./src/*"
+      ]
+    }
   },
-  "include": ["src"],
-  "exclude": ["**/*.stories.tsx"],
-  "references": [{ "path": "./tsconfig.node.json" }]
+  "include": [
+    "src"
+  ],
+  "exclude": [
+    "**/*.stories.tsx"
+  ],
+  "references": [
+    {
+      "path": "./tsconfig.node.json"
+    }
+  ]
 }

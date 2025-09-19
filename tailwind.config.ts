@@ -1,23 +1,12 @@
-import type { Config } from "tailwindcss";
-import plugin from "tailwindcss/plugin";
-
-const config = {
-  darkMode: ["class"],
+/** @type {import('tailwindcss').Config} */
+export default {
   content: [
     "./pages/**/*.{ts,tsx}",
     "./components/**/*.{ts,tsx}",
     "./app/**/*.{ts,tsx}",
     "./src/**/*.{ts,tsx}"
   ],
-  prefix: "",
   theme: {
-    container: {
-      center: true,
-      padding: "2rem",
-      screens: {
-        "2xl": "1400px"
-      }
-    },
     extend: {
       colors: {
         border: "hsl(var(--border))",
@@ -86,13 +75,6 @@ const config = {
     }
   },
   plugins: [
-    require("tailwindcss-animate"),
-    plugin(function ({ addBase }) {
-      addBase({
-        html: { fontSize: "14px" }
-      });
-    })
+    require("tailwindcss-animate")
   ]
-} satisfies Config;
-
-export default config;
+};
