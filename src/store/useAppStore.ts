@@ -26,6 +26,11 @@ interface AppState {
   sidebarOpen: boolean
   setSidebarOpen: (open: boolean) => void
   toggleSidebar: () => void
+  
+  // Mobile sidebar state
+  mobileSidebarOpen: boolean
+  setMobileSidebarOpen: (open: boolean) => void
+  toggleMobileSidebar: () => void
 }
 
 export const useAppStore = create<AppState>()(
@@ -59,6 +64,11 @@ export const useAppStore = create<AppState>()(
         sidebarOpen: true,
         setSidebarOpen: (sidebarOpen) => set({ sidebarOpen }),
         toggleSidebar: () => set((state) => ({ sidebarOpen: !state.sidebarOpen })),
+        
+        // Mobile sidebar
+        mobileSidebarOpen: false,
+        setMobileSidebarOpen: (mobileSidebarOpen) => set({ mobileSidebarOpen }),
+        toggleMobileSidebar: () => set((state) => ({ mobileSidebarOpen: !state.mobileSidebarOpen })),
       }),
       {
         name: 'app-store',

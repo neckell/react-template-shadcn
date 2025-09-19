@@ -20,56 +20,111 @@ const navigation = [
 
 export function Sidebar() {
   const location = useLocation()
-  const { sidebarOpen, toggleSidebar } = useAppStore()
+  const { sidebarOpen, toggleSidebar, mobileSidebarOpen, setMobileSidebarOpen } = useAppStore()
 
   return (
-    <div className={cn(
-      "fixed left-0 top-0 z-40 h-screen bg-card border-r transition-all duration-300",
-      sidebarOpen ? "w-64" : "w-16"
-    )}>
-      {/* Header */}
-      <div className="flex h-16 items-center justify-between px-4 border-b">
-        {sidebarOpen && (
-          <h1 className="text-xl font-semibold">Management</h1>
-        )}
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={toggleSidebar}
-          className="h-8 w-8"
-        >
-          {sidebarOpen ? (
-            <ChevronLeft className="h-4 w-4" />
-          ) : (
-            <ChevronRight className="h-4 w-4" />
+    <>
+      {/* Mobile backdrop overlay */}
+      {mobileSidebarOpen && (
+        <div 
+          className="fixed inset-0 z-30 bg-black/50 md:hidden" 
+          onClick={() => setMobileSidebarOpen(false)}
+        />
+      )}
+
+      {/* Desktop Sidebar */}
+      <div className={cn(
+        "fixed left-0 top-0 z-40 h-screen bg-card border-r transition-all duration-300 hidden md:block",
+        sidebarOpen ? "w-64" : "w-16"
+      )}>
+        {/* Header */}
+        <div className="flex h-16 items-center justify-between px-4 border-b">
+          {sidebarOpen && (
+            <h1 className="text-xl font-semibold">Management</h1>
           )}
-        </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={toggleSidebar}
+            className="h-8 w-8"
+          >
+            {sidebarOpen ? (
+              <ChevronLeft className="h-4 w-4" />
+            ) : (
+              <ChevronRight className="h-4 w-4" />
+            )}
+          </Button>
+        </div>
+
+        {/* Navigation */}
+        <nav className="p-4 space-y-2">
+          {navigation.map((item) => {
+            const isActive = location.pathname === item.href
+            const Icon = item.icon
+
+            return (
+              <Link
+                key={item.name}
+                to={item.href}
+                className={cn(
+                  "flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors",
+                  isActive
+                    ? "bg-primary text-primary-foreground"
+                    : "text-muted-foreground hover:bg-accent hover:text-accent-foreground",
+                  !sidebarOpen && "justify-center"
+                )}
+              >
+                <Icon className="h-5 w-5 flex-shrink-0" />
+                {sidebarOpen && <span>{item.name}</span>}
+              </Link>
+            )
+          })}
+        </nav>
       </div>
 
-      {/* Navigation */}
-      <nav className="p-4 space-y-2">
-        {navigation.map((item) => {
-          const isActive = location.pathname === item.href
-          const Icon = item.icon
+      {/* Mobile Sidebar */}
+      <div className={cn(
+        "fixed left-0 top-0 z-40 h-screen w-64 bg-card border-r transition-transform duration-300 md:hidden",
+        mobileSidebarOpen ? "translate-x-0" : "-translate-x-full"
+      )}>
+        {/* Header */}
+        <div className="flex h-16 items-center justify-between px-4 border-b">
+          <h1 className="text-xl font-semibold">Management</h1>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setMobileSidebarOpen(false)}
+            className="h-8 w-8"
+          >
+            <ChevronLeft className="h-4 w-4" />
+          </Button>
+        </div>
 
-          return (
-            <Link
-              key={item.name}
-              to={item.href}
-              className={cn(
-                "flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors",
-                isActive
-                  ? "bg-primary text-primary-foreground"
-                  : "text-muted-foreground hover:bg-accent hover:text-accent-foreground",
-                !sidebarOpen && "justify-center"
-              )}
-            >
-              <Icon className="h-5 w-5 flex-shrink-0" />
-              {sidebarOpen && <span>{item.name}</span>}
-            </Link>
-          )
-        })}
-      </nav>
-    </div>
+        {/* Navigation */}
+        <nav className="p-4 space-y-2">
+          {navigation.map((item) => {
+            const isActive = location.pathname === item.href
+            const Icon = item.icon
+
+            return (
+              <Link
+                key={item.name}
+                to={item.href}
+                onClick={() => setMobileSidebarOpen(false)}
+                className={cn(
+                  "flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors",
+                  isActive
+                    ? "bg-primary text-primary-foreground"
+                    : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
+                )}
+              >
+                <Icon className="h-5 w-5 flex-shrink-0" />
+                <span>{item.name}</span>
+              </Link>
+            )
+          })}
+        </nav>
+      </div>
+    </>
   )
 }

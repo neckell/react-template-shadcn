@@ -1,9 +1,9 @@
-import { Moon, Sun, Bell, User } from 'lucide-react'
+import { Moon, Sun, Bell, User, Menu } from 'lucide-react'
 import { Button } from '../ui/button'
 import { useAppStore } from '../../store/useAppStore'
 
 export function Header() {
-  const { theme, setTheme } = useAppStore()
+  const { theme, setTheme, toggleMobileSidebar } = useAppStore()
 
   const toggleTheme = () => {
     const newTheme = theme === 'light' ? 'dark' : 'light'
@@ -13,8 +13,17 @@ export function Header() {
   return (
     <header className="h-16 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="flex h-full items-center justify-between px-6">
-        {/* Left side - could add breadcrumbs here */}
+        {/* Left side - mobile hamburger and title */}
         <div className="flex items-center gap-4">
+          {/* Mobile hamburger menu - only visible on mobile */}
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={toggleMobileSidebar}
+            className="h-9 w-9 md:hidden"
+          >
+            <Menu className="h-4 w-4" />
+          </Button>
           <h2 className="text-lg font-semibold">Dashboard</h2>
         </div>
 

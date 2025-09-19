@@ -19,13 +19,16 @@ export function Layout() {
         {/* Main content */}
         <div className={cn(
           "flex-1 flex flex-col transition-all duration-300",
-          sidebarOpen ? "ml-64" : "ml-16"
+          // Desktop: adjust margin based on sidebar state
+          // Mobile: no margin (sidebar is overlay)
+          "md:ml-16 md:transition-[margin]",
+          sidebarOpen && "md:ml-64"
         )}>
           {/* Header */}
           <Header />
 
           {/* Page content */}
-          <main className="flex-1 overflow-auto p-6">
+          <main className="flex-1 overflow-auto p-4 md:p-6">
             <Outlet />
           </main>
         </div>
