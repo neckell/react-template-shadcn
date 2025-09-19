@@ -1,0 +1,122 @@
+{
+  "project_name": "react-management-template",
+  "description": "A production-ready React template for building classic web applications focused on management systems with table-heavy interfaces",
+  "requirements": {
+    "core_framework": {
+      "react": "^18.2.0",
+      "typescript": "^5.0.0",
+      "build_tool": "vite"
+    },
+    "state_management": {
+      "global_state": "@zustand/zustand",
+      "server_state": "@tanstack/react-query",
+      "query_devtools": "@tanstack/react-query-devtools"
+    },
+    "routing": {
+      "router": "@tanstack/react-router",
+      "router_devtools": "@tanstack/router-devtools"
+    },
+    "ui_components": {
+      "component_library": "shadcn/ui",
+      "styling": "tailwindcss",
+      "icons": "lucide-react",
+      "animations": "framer-motion"
+    },
+    "data_handling": {
+      "tables": "@tanstack/react-table",
+      "forms": "react-hook-form",
+      "validation": "zod",
+      "charts": "recharts",
+      "dates": "date-fns"
+    },
+    "http_client": {
+      "client": "axios"
+    },
+    "development_tools": {
+      "linting": "eslint",
+      "formatting": "prettier", 
+      "pre_commit": "husky + lint-staged"
+    }
+  },
+  "folder_structure": {
+    "src/": {
+      "components/": {
+        "ui/": "shadcn/ui components",
+        "features/": "business logic components",
+        "layouts/": "layout components"
+      },
+      "hooks/": "custom React hooks",
+      "store/": "Zustand stores",
+      "services/": "API services and configurations",
+      "types/": "TypeScript type definitions",
+      "utils/": "utility functions and helpers",
+      "pages/": "page components",
+      "routes/": "TanStack Router route definitions"
+    }
+  },
+  "features_to_implement": {
+    "essential_components": [
+      "Data table component with sorting, filtering, pagination using TanStack Table",
+      "CRUD forms with React Hook Form + Zod validation",
+      "Global loading states and error boundaries",
+      "Toast notification system using shadcn Toast",
+      "Responsive layout with sidebar navigation",
+      "Dark/light theme toggle",
+      "Authentication layout and protected routes"
+    ],
+    "example_pages": [
+      "Dashboard with sample charts and metrics",
+      "Users management table with CRUD operations",
+      "Sample form page with various input types",
+      "Settings page with theme toggle"
+    ],
+    "api_integration": [
+      "TanStack Query setup with axios",
+      "Example API service structure",
+      "Error handling and retry logic",
+      "Loading states management"
+    ]
+  },
+  "shadcn_components_to_install": [
+    "button", "input", "label", "table", "dialog", "form", 
+    "select", "checkbox", "radio-group", "textarea", "toast",
+    "dropdown-menu", "navigation-menu", "card", "badge",
+    "alert", "separator", "switch", "tabs", "sheet"
+  ],
+  "configuration_files": {
+    "vite_config": "Configure Vite with TypeScript, path aliases, and development server",
+    "tailwind_config": "Configure Tailwind with shadcn/ui theme variables",
+    "tsconfig": "Configure TypeScript with strict mode and path mapping",
+    "eslint_prettier": "Configure code quality tools with React and TypeScript rules"
+  },
+  "sample_data": {
+    "mock_api": "Create sample JSON data for users, products, or any typical management entities",
+    "api_endpoints": "Mock API endpoints structure for demonstration"
+  },
+  "instructions": [
+    "Initialize project with Vite + React + TypeScript template",
+    "Install and configure all specified dependencies",
+    "Set up shadcn/ui with the listed components",
+    "Create the folder structure as specified",
+    "Implement a fully functional data table with sample data",
+    "Set up TanStack Router with example routes",
+    "Configure Zustand store with sample global state",
+    "Implement TanStack Query with sample API calls",
+    "Create responsive layout with sidebar navigation",
+    "Add theme provider with dark/light mode",
+    "Include sample CRUD forms with proper validation",
+    "Set up development tools (ESLint, Prettier, Husky)",
+    "Add proper TypeScript types throughout",
+    "Include README with setup and usage instructions"
+  ],
+  "success_criteria": [
+    "Template runs without errors in development",
+    "All routes work with TanStack Router",
+    "Data table displays and functions properly",
+    "Forms validate and submit correctly",
+    "Theme toggle works between light/dark modes",
+    "Responsive design works on mobile and desktop",
+    "TypeScript compiles without errors",
+    "Code passes ESLint and Prettier checks"
+  ]
+}
